@@ -52,4 +52,8 @@ An intuitive, beautifully designed weather forecasting application built for the
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
-*Developed by [LakiDev](https://github.com/lakipop) for the Syntecxhub Internship Program.*
+**Developer:** LSR Vidanaarachchi<br>
+**Portfolio:** [lakidev.me](https://lakidev.me/)<br>
+**GitHub:** [lakipop](https://github.com/lakipop)<br>
+
+*Developed for the SyntecXhub Internship Program*
