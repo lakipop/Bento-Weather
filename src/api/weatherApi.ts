@@ -32,37 +32,39 @@ const handleResponse = async (res: Response) => {
   return res.json();
 };
 
-export const getCurrentWeather = async (city: string): Promise<CurrentWeather> => {
+export const getCurrentWeather = async (cityOrCoord: string | { lat: number; lon: number }): Promise<CurrentWeather> => {
   if (!API_KEY) {
     throw new WeatherApiError('Missing OpenWeatherMap API Key in Environment Variables.', 401);
   }
-  const res = await fetch(`${BASE_URL}/weather?q=${encodeURIComponent(city)}&units=metric&appid=${API_KEY}`);
+  const query = typeof cityOrCoord === 'string' 
+    ? `q=${encodeURIComponent(cityOrCoord)}`
+    : `lat=${cityOrCoord.lat}&lon=${cityOrCoord.lon}`;
+  
+  const res = await fetch(`${BASE_URL}/weather?${query}&units=metric&appid=${API_KEY}`);
   return handleResponse(res);
 };
 
-export const getForecast = async (city: string): Promise<ForecastItem[]> => {
+export const getForecast = async (cityOrCoord: string | { lat: number; lon: number }): Promise<ForecastItem[]> => {
   if (!API_KEY) {
     throw new WeatherApiError('Missing OpenWeatherMap API Key in Environment Variables.', 401);
   }
-  // Forecast endpoint returns 3-hour increments for 5 days (40 entries)
-  const res = await fetch(`${BASE_URL}/forecast?q=${encodeURIComponent(city)}&units=metric&appid=${API_KEY}`);
+  const query = typeof cityOrCoord === 'string' 
+    ? `q=${encodeURIComponent(cityOrCoord)}`
+    : `lat=${cityOrCoord.lat}&lon=${cityOrCoord.lon}`;
+
+  const res = await fetch(`${BASE_URL}/forecast?${query}&units=metric&appid=${API_KEY}`);
   const data: ForecastResponse = await handleResponse(res);
   
-  // Reduce to 1 entry per day (typically around noon, or first instance per day)
   const dailyForecast: ForecastItem[] = [];
   const seenDays = new Set<string>();
 
   for (const item of data.list) {
-    // extract date "YYYY-MM-DD"
     const dateStr = item.dt_txt.split(' ')[0];
-    
-    // Attempt to grab the ~12:00:00 entry, or just the first seen for that day if not mapped yet
     if (!seenDays.has(dateStr)) {
       seenDays.add(dateStr);
       dailyForecast.push(item);
     }
   }
 
-  // usually limits to 5 days
   return dailyForecast.slice(0, 5);
 };

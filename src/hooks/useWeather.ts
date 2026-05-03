@@ -2,85 +2,94 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { CurrentWeather, ForecastItem } from '../types/weather.types';
 import { getCurrentWeather, getForecast, WeatherApiError } from '../api/weatherApi';
 
+const STORAGE_KEY = 'weather_saved_locations';
+
 export const useWeather = () => {
   const [currentWeather, setCurrentWeather] = useState<CurrentWeather | null>(null);
   const [forecast, setForecast] = useState<ForecastItem[]>([]);
   const [query, setQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [savedLocations, setSavedLocations] = useState<string[]>([]);
 
   const debounceTimeout = useRef<number | null>(null);
 
-  const fetchWeather = async (city: string) => {
-    if (!city.trim()) {
-      setCurrentWeather(null);
-      setForecast([]);
-      setError(null);
-      setIsLoading(false);
+  // Load saved locations on mount
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      try {
+        setSavedLocations(JSON.parse(stored));
+      } catch (e) {
+        setSavedLocations([]);
+      }
+    }
+  }, []);
+
+  // Save locations when they change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedLocations));
+  }, [savedLocations]);
+
+  const fetchWeather = async (cityOrCoord: string | { lat: number; lon: number }) => {
+    if (typeof cityOrCoord === 'string' && !cityOrCoord.trim()) {
       return;
     }
 
     setIsLoading(true);
     setError(null);
 
-    const [currentRes, forecastRes] = await Promise.allSettled([
-      getCurrentWeather(city),
-      getForecast(city)
-    ]);
-
-    let hasError = false;
-
-    if (currentRes.status === 'fulfilled') {
-      setCurrentWeather(currentRes.value);
-    } else {
-      hasError = true;
-      const err = currentRes.reason;
+    try {
+      const [currentData, forecastData] = await Promise.all([
+        getCurrentWeather(cityOrCoord),
+        getForecast(cityOrCoord)
+      ]);
+      setCurrentWeather(currentData);
+      setForecast(forecastData);
+    } catch (err) {
       if (err instanceof WeatherApiError) {
         setError(err.message);
       } else {
-        setError('Network error. Please check your connection.');
+        setError('Failed to fetch weather data.');
       }
       setCurrentWeather(null);
-    }
-
-    if (forecastRes.status === 'fulfilled') {
-      setForecast(forecastRes.value);
-    } else {
-      if (!hasError) { // if currentWeather succeeded but forecast failed
-         const err = forecastRes.reason;
-         setError(err instanceof WeatherApiError ? err.message : 'Network error while fetching forecast.');
-      }
       setForecast([]);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
+  // Auto-detect location on mount
   useEffect(() => {
-    if (debounceTimeout.current) {
-      clearTimeout(debounceTimeout.current);
+    if (!query && !currentWeather && !isLoading) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          fetchWeather({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+        },
+        () => {
+          // Fallback to a default city if geolocation fails
+          fetchWeather('Colombo');
+        }
+      );
     }
-    
-    debounceTimeout.current = window.setTimeout(() => {
-      fetchWeather(query);
-    }, 500);
-
-    return () => {
-      if (debounceTimeout.current) {
-        clearTimeout(debounceTimeout.current);
-      }
-    };
-  }, [query]);
+  }, []);
 
   const handleSearch = useCallback((city: string) => {
     setQuery(city);
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+    debounceTimeout.current = window.setTimeout(() => {
+      fetchWeather(city);
+    }, 600);
   }, []);
 
-  const handleClear = useCallback(() => {
-    setQuery('');
-    setCurrentWeather(null);
-    setForecast([]);
-    setError(null);
+  const saveLocation = useCallback((city: string) => {
+    if (!savedLocations.includes(city)) {
+      setSavedLocations(prev => [...prev, city]);
+    }
+  }, [savedLocations]);
+
+  const removeLocation = useCallback((city: string) => {
+    setSavedLocations(prev => prev.filter(c => c !== city));
   }, []);
 
   return {
@@ -88,8 +97,11 @@ export const useWeather = () => {
     forecast,
     query,
     handleSearch,
-    handleClear,
     isLoading,
-    error
+    error,
+    savedLocations,
+    saveLocation,
+    removeLocation,
+    fetchWeather
   };
 };
