@@ -1,49 +1,40 @@
-# Implementation Plan - Bento Weather App
+# Implementation Plan - Bento Weather Enhancements
 
-Transitioning from the Notes App to the **Bento Weather App** (Project 2). This plan addresses the persistent API key errors by implementing a robust mock data fallback and polishes the UI/UX to meet the "Forest & Sand" aesthetic requirements.
+Addressing search efficiency, forecast duration, and footer aesthetics to reach production-grade quality.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> The "Invalid API Key" error occurs because the OpenWeatherMap key in `.env` is returning a 401 status. I will implement a **Mock Data Mode** that automatically activates when the API key is invalid or missing, allowing you to develop and test the UI seamlessly.
+> - **Search Suggestions**: I will implement city suggestions using the Geocoding API. This prevents "City not found" errors for partial typing and reduces unnecessary API load.
+> - **7-Day Forecast**: Since OpenWeatherMap's free tier only provides 5 days, I will integrate **Open-Meteo** for the forecast data. This provides a full 7-day view for free and demonstrates "High Availability" architecture.
+> - **Pill Footer**: I will port the animated pill-shaped footer from the Notes App, adapted for the "Forest & Sand" glass aesthetic.
 
 ## Proposed Changes
 
 ### [Component] API & Data Layer
 
 #### [MODIFY] [weatherApi.ts](file:///d:/Projects/SyntecXhub%20Intern/Syntecxhub_Weather-App/src/api/weatherApi.ts)
-- Implement a `MOCK_WEATHER_DATA` and `MOCK_FORECAST_DATA` constant.
-- Update `getCurrentWeather` and `getForecast` to return mock data if the API returns a 401/403 status.
-- Log a subtle warning in the console when mock data is being used.
-
-### [Component] UI & Styling (Strictly No Layout Changes)
-
-#### [MODIFY] [index.css](file:///d:/Projects/SyntecXhub%20Intern/Syntecxhub_Weather-App/src/index.css)
-- Update CSS variables using absolute hex codes from `weatherappcolors.jpg`:
-  - `--color-forest: #19350C;`
-  - `--color-olive: #687D31;`
-  - `--color-sand: #D5D3CC;`
-  - `--color-teal: #406768;`
-  - `--color-sky: #6FA9BB;`
-- Apply these tokens to the existing classes without altering the `bento-grid` logic.
-
-#### [MODIFY] [App.tsx](file:///d:/Projects/SyntecXhub%20Intern/Syntecxhub_Weather-App/src/App.tsx)
-- Ensure the footer attribution remains strictly formatted.
-- Add a subtle status indicator for "Offline Mode" (Mock Data) without breaking the existing Bento layout.
+- Add `getCitySuggestions(query: string)` function using the OpenWeather Geocoding API.
+- Add `get7DayForecast(lat: number, lon: number)` function using the **Open-Meteo API** to fulfill the 7-day requirement.
+- Update `getForecast` to utilize the new 7-day logic.
 
 ### [Component] Hooks & Logic
 
 #### [MODIFY] [useWeather.ts](file:///d:/Projects/SyntecXhub%20Intern/Syntecxhub_Weather-App/src/hooks/useWeather.ts)
-- Improve error handling to distinguish between "Real API Failures" and "Graceful Mock Fallbacks".
-- Ensure geolocation fallback is seamless.
+- Add `suggestions` state to store city results.
+- Implement a 500ms debounce for suggestion fetching.
+- Update `fetchWeather` to handle the 7-day data.
+
+### [Component] UI & Styling
+
+#### [MODIFY] [App.tsx](file:///d:/Projects/SyntecXhub%20Intern/Syntecxhub_Weather-App/src/App.tsx)
+- **Search Suggestions**: Add a dropdown list below the search input that appears as the user types.
+- **7-Day Forecast**: Update the forecast bento card to display 7 items instead of 5.
+- **Premium Footer**: Replace the current footer with the animated pill-shaped buttons (Portfolio/GitHub) from the Notes App.
 
 ## Verification Plan
 
-### Automated Tests
-- N/A (Manual verification via browser as per user rules).
-
 ### Manual Verification
-1.  **Mock Fallback**: Disable the API key in `.env` and verify the app loads mock data instead of showing an error.
-2.  **Search**: Enter a city and verify the UI updates (even with mock data, it should simulate a load state).
-3.  **Responsive**: Check the bento grid on mobile vs desktop.
-4.  **Aesthetics**: Verify the "Forest & Sand" colors are correctly applied.
+1.  **Suggestions**: Type "Col" and verify "Colombo" appears in a list. Select it to fetch weather.
+2.  **7-Day View**: Verify the forecast grid now shows 7 days.
+3.  **Footer**: Check the footer for pill shapes and spinning icons with glass effects.

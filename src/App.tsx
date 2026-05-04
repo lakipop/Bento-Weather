@@ -13,6 +13,7 @@ export default function App() {
     currentWeather, 
     forecast, 
     query, 
+    suggestions,
     handleSearch, 
     isLoading, 
     error,
@@ -59,6 +60,25 @@ export default function App() {
             placeholder="Search for a city..."
             className="w-full pl-12 pr-4 py-4 glass-card bg-white/5 border-white/10 outline-none focus:border-[var(--color-brand-primary)]/50 transition-all text-lg"
           />
+
+          {/* Search Suggestions Dropdown */}
+          {suggestions.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-2 glass-card bg-[#19350C]/90 backdrop-blur-2xl border-white/10 overflow-hidden z-50 shadow-2xl">
+              {suggestions.map((city, idx) => (
+                <button
+                  key={`${city.lat}-${city.lon}-${idx}`}
+                  onClick={() => fetchWeather({ lat: city.lat, lon: city.lon })}
+                  className="w-full px-6 py-4 text-left hover:bg-white/10 flex items-center justify-between group transition-colors border-b border-white/5 last:border-0"
+                >
+                  <div className="flex flex-col">
+                    <span className="font-bold text-white/90">{city.name}</span>
+                    <span className="text-[10px] uppercase tracking-widest text-white/40 font-black">{city.state ? `${city.state}, ` : ''}{city.country}</span>
+                  </div>
+                  <Navigation size={14} className="text-white/20 group-hover:text-[var(--color-brand-primary)] transition-colors" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         
         <div className="flex gap-2">
@@ -189,21 +209,21 @@ export default function App() {
             </div>
           </div>
 
-          {/* [REQUIREMENT: Display forecasts (5-Day)] */}
+          {/* [REQUIREMENT: Display forecasts (7-Day)] */}
           <div className="col-span-1 md:col-span-4 glass-card p-8 mt-4">
             <div className="flex items-center gap-3 text-white/40 mb-8">
               <Calendar size={18} />
-              <h3 className="text-sm uppercase tracking-widest font-bold">5-Day Forecast</h3>
+              <h3 className="text-sm uppercase tracking-widest font-bold">7-Day Forecast</h3>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-4">
               {forecast.map((item, idx) => (
-                <div key={idx} className="flex flex-col items-center p-4 rounded-3xl bg-white/5 hover:bg-white/10 transition-all group">
-                  <span className="text-sm font-bold text-white/60 mb-3">{idx === 0 ? 'Today' : getDayName(item.dt_txt)}</span>
+                <div key={idx} className="flex flex-col items-center p-4 rounded-3xl bg-white/5 hover:bg-white/10 transition-all group border border-white/5">
+                  <span className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-3">{idx === 0 ? 'Today' : getDayName(item.dt_txt)}</span>
                   <div className="mb-3 group-hover:scale-110 transition-transform duration-300">
-                    {getWeatherIcon(item.weather[0].description, 32)}
+                    {getWeatherIcon(item.weather[0].main, 32)}
                   </div>
-                  <span className="text-xl font-bold">{Math.round(item.main.temp)}°</span>
-                  <span className="text-[10px] text-white/20 uppercase tracking-widest mt-1 font-bold">{item.weather[0].main}</span>
+                  <span className="text-xl font-black text-[var(--color-text-primary)]">{Math.round(item.main.temp)}°</span>
+                  <span className="text-[9px] text-white/20 uppercase tracking-widest mt-1 font-black">{item.weather[0].main}</span>
                 </div>
               ))}
             </div>
@@ -219,12 +239,42 @@ export default function App() {
         </div>
       )}
 
-      {/* Professional Footer */}
-      <footer className="mt-20 py-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-white/20">
-        <p className="text-sm font-medium">© 2026 LSR Vidanaarachchi</p>
-        <div className="flex gap-6">
-          <a href="https://lakidev.me" className="text-xs hover:text-[var(--color-brand-primary)] transition-colors uppercase tracking-widest font-bold">Portfolio</a>
-          <a href="https://github.com/lakipop" className="text-xs hover:text-[var(--color-brand-primary)] transition-colors uppercase tracking-widest font-bold">GitHub</a>
+      {/* Premium Glass Pill Footer */}
+      <footer className="mt-24 pb-12 flex flex-col items-center gap-8">
+        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent mb-4" />
+        
+        <div className="flex flex-col md:flex-row items-center gap-6 md:gap-12">
+          <p className="text-sm font-black uppercase tracking-[0.3em] text-white/20">© 2026 LSR Vidanaarachchi</p>
+          
+          <div className="flex items-center gap-4">
+            <a 
+              href="https://lakidev.me" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="group relative flex items-center gap-3 px-6 py-3 rounded-full glass-card bg-white/5 hover:bg-white/10 border-white/10 hover:border-[var(--color-brand-primary)]/50 transition-all duration-500 overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-brand-primary)]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="p-2 rounded-full bg-white/5 group-hover:rotate-[360deg] transition-transform duration-700">
+                <Navigation size={14} className="text-[var(--color-brand-primary)]" />
+              </div>
+              <span className="text-xs font-black uppercase tracking-[0.2em] text-white/60 group-hover:text-white transition-colors">Portfolio</span>
+            </a>
+
+            <a 
+              href="https://github.com/lakipop" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="group relative flex items-center gap-3 px-6 py-3 rounded-full glass-card bg-white/5 hover:bg-white/10 border-white/10 hover:border-white/30 transition-all duration-500 overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="p-2 rounded-full bg-white/5 group-hover:rotate-[360deg] transition-transform duration-700">
+                <svg className="w-3.5 h-3.5 text-white/60 group-hover:text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+                </svg>
+              </div>
+              <span className="text-xs font-black uppercase tracking-[0.2em] text-white/60 group-hover:text-white transition-colors">GitHub</span>
+            </a>
+          </div>
         </div>
       </footer>
     </div>

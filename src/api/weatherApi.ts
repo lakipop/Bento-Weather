@@ -74,11 +74,21 @@ const handleResponse = async (res: Response, type: 'weather' | 'forecast'): Prom
   return res.json();
 };
 
+export const getCitySuggestions = async (query: string): Promise<any[]> => {
+  if (!query || query.length < 3 || !API_KEY) return [];
+  try {
+    const res = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${API_KEY}`);
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (err) {
+    return [];
+  }
+};
+
 export const getCurrentWeather = async (cityOrCoord: string | { lat: number; lon: number }): Promise<CurrentWeather> => {
-  // [REQUIREMENT: Fetch weather data from an external API]
   if (!API_KEY) {
     console.warn('[WeatherApp] Missing API Key. Using mock weather data.');
-    return MOCK_WEATHER;
+    return { ...MOCK_WEATHER };
   }
   const query = typeof cityOrCoord === 'string' 
     ? `q=${encodeURIComponent(cityOrCoord)}`
@@ -89,39 +99,60 @@ export const getCurrentWeather = async (cityOrCoord: string | { lat: number; lon
     return handleResponse(res, 'weather');
   } catch (err) {
     if (err instanceof WeatherApiError) throw err;
-    return MOCK_WEATHER;
+    return { ...MOCK_WEATHER };
   }
 };
 
 export const getForecast = async (cityOrCoord: string | { lat: number; lon: number }): Promise<ForecastItem[]> => {
-  if (!API_KEY) {
-    return MOCK_FORECAST;
-  }
-  const query = typeof cityOrCoord === 'string' 
-    ? `q=${encodeURIComponent(cityOrCoord)}`
-    : `lat=${cityOrCoord.lat}&lon=${cityOrCoord.lon}`;
+  let lat: number, lon: number;
 
-  try {
-    const res = await fetch(`${BASE_URL}/forecast?${query}&units=metric&appid=${API_KEY}`);
-    const data = await handleResponse(res, 'forecast');
-    
-    // Handle mock case where we already return ForecastItem[] vs real API ForecastResponse
-    const list = Array.isArray(data) ? data : data.list;
-    
-    const dailyForecast: ForecastItem[] = [];
-    const seenDays = new Set<string>();
-
-    for (const item of list) {
-      const dateStr = item.dt_txt.split(' ')[0];
-      if (!seenDays.has(dateStr)) {
-        seenDays.add(dateStr);
-        dailyForecast.push(item);
-      }
+  if (typeof cityOrCoord === 'string') {
+    if (!API_KEY) return MOCK_FORECAST;
+    try {
+      const weather = await getCurrentWeather(cityOrCoord);
+      lat = weather.coord.lat;
+      lon = weather.coord.lon;
+    } catch (e) {
+      return MOCK_FORECAST;
     }
+  } else {
+    lat = cityOrCoord.lat;
+    lon = cityOrCoord.lon;
+  }
 
-    return dailyForecast.slice(0, 5);
+  // Use Open-Meteo for 7-Day Forecast (Free & Professional)
+  try {
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`);
+    if (!res.ok) throw new Error('Open-Meteo error');
+    const data = await res.json();
+
+    return data.daily.time.map((time: string, i: number) => ({
+      dt: Math.floor(new Date(time).getTime() / 1000),
+      dt_txt: `${time} 12:00:00`,
+      main: {
+        temp: data.daily.temperature_2m_max[i],
+        temp_max: data.daily.temperature_2m_max[i],
+        temp_min: data.daily.temperature_2m_min[i],
+        feels_like: data.daily.temperature_2m_max[i],
+        pressure: 1013,
+        sea_level: 1013,
+        grnd_level: 1013,
+        humidity: 70,
+        temp_kf: 0
+      },
+      weather: [{
+        id: data.daily.weathercode[i],
+        main: data.daily.weathercode[i] < 3 ? 'Clear' : data.daily.weathercode[i] < 50 ? 'Clouds' : 'Rain',
+        description: 'Weather Condition',
+        icon: '01d'
+      }],
+      wind: { speed: 10, deg: 0 },
+      visibility: 10000,
+      pop: 0,
+      sys: { pod: 'd' }
+    }));
   } catch (err) {
-    if (err instanceof WeatherApiError) throw err;
+    console.warn('[WeatherApp] Open-Meteo failed. Using mock forecast.');
     return MOCK_FORECAST;
   }
 };

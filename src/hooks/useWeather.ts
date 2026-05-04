@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { CurrentWeather, ForecastItem } from '../types/weather.types';
-import { getCurrentWeather, getForecast, WeatherApiError } from '../api/weatherApi';
+import { CurrentWeather, ForecastItem, CitySuggestion } from '../types/weather.types';
+import { getCurrentWeather, getForecast, getCitySuggestions, WeatherApiError } from '../api/weatherApi';
 
 const STORAGE_KEY = 'weather_saved_locations';
 
@@ -8,13 +8,14 @@ export const useWeather = () => {
   const [currentWeather, setCurrentWeather] = useState<CurrentWeather | null>(null);
   const [forecast, setForecast] = useState<ForecastItem[]>([]);
   const [query, setQuery] = useState<string>('');
+  const [suggestions, setSuggestions] = useState<CitySuggestion[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [savedLocations, setSavedLocations] = useState<string[]>([]);
-
+  const isFirstRender = useRef(true);
   const debounceTimeout = useRef<number | null>(null);
 
-  // [REQUIREMENT: Fetch weather data using useEffect (Initial Load)]
+  // [REQUIREMENT: Fetch weather data using useEffect (Initial Load - Persisted)]
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
@@ -28,17 +29,17 @@ export const useWeather = () => {
 
   // Save locations when they change
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(savedLocations));
   }, [savedLocations]);
 
   const fetchWeather = async (cityOrCoord: string | { lat: number; lon: number }) => {
-    if (typeof cityOrCoord === 'string' && !cityOrCoord.trim()) {
-      return;
-    }
-
     setIsLoading(true);
-    // Only clear error if we are searching, keep it if we just landed on a failed state
     setError(null);
+    setSuggestions([]); // Clear suggestions on fetch
 
     try {
       const [currentData, forecastData] = await Promise.all([
@@ -47,17 +48,13 @@ export const useWeather = () => {
       ]);
       setCurrentWeather(currentData);
       setForecast(forecastData);
-      
-      // If we got here, we have data (could be mock if API failed silently)
-      // Check if it's mock and set a specific status if needed
+      if (typeof cityOrCoord === 'string') setQuery(currentData.name);
     } catch (err) {
       if (err instanceof WeatherApiError) {
         setError(err.message);
       } else {
         setError('Connection error. Using offline data.');
       }
-      // Note: weatherApi already returns mock data for 401s, 
-      // but this catch handles other failures like network issues
     } finally {
       setIsLoading(false);
     }
@@ -71,19 +68,26 @@ export const useWeather = () => {
           fetchWeather({ lat: pos.coords.latitude, lon: pos.coords.longitude });
         },
         () => {
-          // Fallback to a default city if geolocation fails
           fetchWeather('Colombo');
         }
       );
     }
   }, []);
 
-  const handleSearch = useCallback((city: string) => {
-    setQuery(city);
+  const handleSearch = useCallback((input: string) => {
+    setQuery(input);
+    
     if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
-    debounceTimeout.current = window.setTimeout(() => {
-      fetchWeather(city);
-    }, 600);
+    
+    if (input.length < 3) {
+      setSuggestions([]);
+      return;
+    }
+
+    debounceTimeout.current = window.setTimeout(async () => {
+      const results = await getCitySuggestions(input);
+      setSuggestions(results);
+    }, 500);
   }, []);
 
   const saveLocation = useCallback((city: string) => {
@@ -100,6 +104,7 @@ export const useWeather = () => {
     currentWeather,
     forecast,
     query,
+    suggestions,
     handleSearch,
     isLoading,
     error,

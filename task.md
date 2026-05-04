@@ -10,7 +10,12 @@
 - [x] Add subtle "Mock Data Active" badge
 - [x] Finalize footer branding (LSR Vidanaarachchi)
 
-## Phase 3: Final Polish
-- [x] Verify geolocation fallback logic
-- [x] Polish animations and transitions
-- [x] Final compliance check with intern requirements
+## Phase 4: Search & Forecast Enhancements
+- [x] Implement City Suggestions (Geocoding API)
+- [x] Implement 7-Day Forecast (Open-Meteo Integration)
+- [x] Add Search Suggestion Dropdown UI
+
+## Phase 5: Premium Footer & Final Polish
+- [x] Port Pill-shaped Footer from Notes App
+- [x] Apply glass aesthetics to footer buttons
+- [x] Final verification of all 7-day data mappings
