@@ -7,46 +7,50 @@ The SyntecXhub Weather App is a dynamic, data-driven application connecting to t
 - **Core:** React 19, TypeScript 5.7
 - **Bundler:** Vite 6.0
 - **Styling:** Tailwind CSS v4 (Glassmorphism & Backdrops)
-- **External Services:** OpenWeatherMap REST API
+- **External Services:** OpenWeatherMap API (Current Weather), Geocoding API (City Suggestions), Open-Meteo API (7-Day Forecast)
 
 ## 3. Data Flow & Integration
 
 ```mermaid
 graph TD
-    A[Search Input] -->|OnChange Event| B[Debounce Ref Timer]
-    B -->|Timer Expires| C(useWeather Hook)
-    C -->|Triggers HTTP GET| D(weatherApi.ts)
+    A[Search Input] -->|Typing| B[Debounce 500ms]
+    B -->|Fetch Suggestions| C(Geocoding API)
+    C -->|Dropdown UI| D[User Selects City]
     
-    D -->|Fetch Request| E((OpenWeatherMap API))
-    E -->|JSON Response| D
+    D -->|Coordinate Fetch| E(useWeather Hook)
+    E -->|Parallel Fetch| F(weatherApi.ts)
     
-    D -->|Validates Status| F{Response OK?}
-    F -- Yes --> G[Normalize Data]
-    F -- No --> H[Throw WeatherApiError]
+    F -->|Current| G((OpenWeatherMap API))
+    F -->|7-Day Forecast| H((Open-Meteo API))
     
-    G --> C
-    H --> C
+    G & H -->|Success| I[Normalize Data]
+    G & H -->|Fail| J[Mock Data Fallback]
     
-    C -->|Updates UI State| I[CurrentWeather / Forecast / ErrorMessage]
+    I & J --> E
+    E -->|Updates UI| K[Bento Grid Display]
 ```
 
 ## 4. Component Hierarchy
 ```mermaid
 graph TD
-    App --> Background[Dynamic Background Gradient]
-    App --> Search[SearchBar]
-    App --> WeatherCard[CurrentWeatherCard]
-    App --> Forecast[ForecastGrid]
+    App --> Header[Header & Animated Logo]
+    App --> Search[SearchBar & Suggestions Dropdown]
+    App --> BentoGrid[Main Display Container]
     
-    Search --> Loader[Loader/Clear Config]
-    Forecast --> GridSlider[Horizontal Scroll Container]
+    BentoGrid --> Hero[Hero Current Weather]
+    BentoGrid --> Locations[Saved Locations Card]
+    BentoGrid --> Details[Visibility & Sun Detail Cards]
+    BentoGrid --> Forecast[7-Day Forecast Grid]
+    
+    App --> Footer[Premium Pill-shaped Footer]
 ```
 
 ## 5. Architectural Highlights
-- **Bento Grid**: A custom CSS Grid system (`grid-template-columns: repeat(4, 1fr)`) designed for high information density and responsive fluidity.
-- **Dynamic CSS Environments**: Application background and card orbs react dynamically to weather condition codes (Sunny, Cloudy, etc.).
-- **Debounce Logic**: `useWeather` hook implements a 500ms debounce ref to prevent API rate-limiting during active typing.
-- **Error Resiliency**: Custom `WeatherApiError` class provides granular feedback for 401 (API key), 404 (City not found), and 429 (Limits) statuses.
+- **High Availability Fetching**: Dual-API strategy using OpenWeatherMap for real-time accuracy and Open-Meteo for extended forecasting.
+- **Mock Data Fallback**: Automatic failover to static weather datasets for 401/403 errors, ensuring 100% UI uptime during API propagation.
+- **Persistence Layer**: Custom `useWeather` hook with `isFirstRender` protection to synchronize `savedLocations` with `localStorage`.
+- **Bento Grid**: A custom CSS Grid system designed for high information density and responsive fluidity.
+- **Debounce Logic**: 500ms buffer on Geocoding suggestions to prevent API rate-limiting during active typing.
 
 ## 6. File Structure
 ```text

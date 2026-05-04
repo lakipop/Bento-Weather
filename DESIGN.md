@@ -42,6 +42,8 @@ Derived from `weatherappcolors.jpg` and `weatherappdesign.jpg`.
 ---
 
 ## Motion & Animation
+- **Animated Brand Logo**: Custom SVG with a rotating sun and floating cloud, matching the "Forest & Sand" palette.
+- **LakiDev Signature Footer**: Double rotating SVGs on the Portfolio button (8s linear spin and reverse spin) for professional branding.
 - **Scale**: Subtle hover lifting on bento cards.
 - **Gradients**: Dynamic weather-based background transitions.
 
