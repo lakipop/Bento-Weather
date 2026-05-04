@@ -37,6 +37,17 @@ export default function App() {
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-8 min-h-screen relative z-10">
+      {/* App Header & Logo */}
+      <div className="flex items-center gap-4 mb-12">
+        <div className="w-12 h-12">
+          <img src="/favicon.svg" alt="Bento Weather Logo" className="w-full h-full" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-black uppercase tracking-[0.3em] text-[var(--color-text-primary)]">Bento Weather</h1>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">Syntecxhub Intern Project</p>
+        </div>
+      </div>
+
       {/* Search & Location Bar */}
       <div className="flex flex-col md:flex-row gap-4 mb-8">
         <div className="flex-1 relative group">
