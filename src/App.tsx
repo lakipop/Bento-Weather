@@ -71,7 +71,7 @@ export default function App() {
           </div>
         )}
         
-        {currentWeather?.name.includes('Mock') && (
+        {currentWeather?.isMock && (
           <div className="px-4 py-2 glass-card bg-orange-500/10 border-orange-500/20 text-orange-400/80 text-[10px] font-black uppercase tracking-[0.2em] w-fit flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" />
             Offline Mode Active

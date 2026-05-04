@@ -35,6 +35,7 @@ export interface CurrentWeather {
   name: string;
   dt: number;
   cod: number;
+  isMock?: boolean;
 }
 
 export interface ForecastItem {
