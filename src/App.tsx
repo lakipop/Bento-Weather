@@ -62,13 +62,22 @@ export default function App() {
         </div>
       </div>
 
-      {/* Error Message */}
-      {error && (
-        <div className="mb-8 p-4 glass-card bg-red-500/10 border-red-500/20 text-red-400 flex items-center gap-3">
-          <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
-          {error}
-        </div>
-      )}
+      {/* Error Message & Mock Indicator */}
+      <div className="flex flex-col gap-3 mb-8">
+        {error && (
+          <div className="p-4 glass-card bg-red-500/10 border-red-500/20 text-red-400 flex items-center gap-3">
+            <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
+            {error}
+          </div>
+        )}
+        
+        {currentWeather?.name.includes('Mock') && (
+          <div className="px-4 py-2 glass-card bg-orange-500/10 border-orange-500/20 text-orange-400/80 text-[10px] font-black uppercase tracking-[0.2em] w-fit flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" />
+            Offline Mode Active
+          </div>
+        )}
+      </div>
 
       {/* Main Bento Grid */}
       {isLoading ? (

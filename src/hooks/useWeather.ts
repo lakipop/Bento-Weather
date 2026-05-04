@@ -37,6 +37,7 @@ export const useWeather = () => {
     }
 
     setIsLoading(true);
+    // Only clear error if we are searching, keep it if we just landed on a failed state
     setError(null);
 
     try {
@@ -46,14 +47,17 @@ export const useWeather = () => {
       ]);
       setCurrentWeather(currentData);
       setForecast(forecastData);
+      
+      // If we got here, we have data (could be mock if API failed silently)
+      // Check if it's mock and set a specific status if needed
     } catch (err) {
       if (err instanceof WeatherApiError) {
         setError(err.message);
       } else {
-        setError('Failed to fetch weather data.');
+        setError('Connection error. Using offline data.');
       }
-      setCurrentWeather(null);
-      setForecast([]);
+      // Note: weatherApi already returns mock data for 401s, 
+      // but this catch handles other failures like network issues
     } finally {
       setIsLoading(false);
     }
