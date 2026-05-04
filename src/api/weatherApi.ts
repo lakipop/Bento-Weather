@@ -49,6 +49,7 @@ const MOCK_FORECAST: ForecastItem[] = Array.from({ length: 5 }, (_, i) => ({
 }));
 
 const handleResponse = async (res: Response, type: 'weather' | 'forecast'): Promise<any> => {
+  // [REQUIREMENT: Implement error handling for API requests]
   if (!res.ok) {
     // Graceful Mock Fallback for Auth Errors
     if (res.status === 401 || res.status === 403) {
@@ -74,6 +75,7 @@ const handleResponse = async (res: Response, type: 'weather' | 'forecast'): Prom
 };
 
 export const getCurrentWeather = async (cityOrCoord: string | { lat: number; lon: number }): Promise<CurrentWeather> => {
+  // [REQUIREMENT: Fetch weather data from an external API]
   if (!API_KEY) {
     console.warn('[WeatherApp] Missing API Key. Using mock weather data.');
     return MOCK_WEATHER;

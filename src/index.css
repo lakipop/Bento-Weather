@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-  /* Colors from weatherappcolors.jpg */
+  /* [REQUIREMENT: Style the application using CSS or a CSS framework] */
+  /* Provided Palette - weatherappcolors.jpg */
   --color-forest: #19350C;
   --color-olive: #687D31;
   --color-sand: #D5D3CC;

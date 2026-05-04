@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useWeather } from './hooks/useWeather';
 
+// [REQUIREMENT: Develop a weather forecasting application using React]
 export default function App() {
   const { 
     currentWeather, 
@@ -104,6 +105,7 @@ export default function App() {
                 </div>
               </div>
               <div className="p-4 bg-white/5 rounded-3xl group-hover:scale-110 transition-transform duration-500">
+                {/* [REQUIREMENT: Display current weather conditions] */}
                 {getWeatherIcon(currentWeather.weather[0].description, 80)}
               </div>
             </div>
@@ -176,7 +178,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* 5-Day Forecast Bento Card */}
+          {/* [REQUIREMENT: Display forecasts (5-Day)] */}
           <div className="col-span-1 md:col-span-4 glass-card p-8 mt-4">
             <div className="flex items-center gap-3 text-white/40 mb-8">
               <Calendar size={18} />

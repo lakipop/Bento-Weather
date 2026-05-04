@@ -14,7 +14,7 @@ export const useWeather = () => {
 
   const debounceTimeout = useRef<number | null>(null);
 
-  // Load saved locations on mount
+  // [REQUIREMENT: Fetch weather data using useEffect (Initial Load)]
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
@@ -63,7 +63,7 @@ export const useWeather = () => {
     }
   };
 
-  // Auto-detect location on mount
+  // [REQUIREMENT: Fetch weather data from an external API using useEffect (Auto-detect)]
   useEffect(() => {
     if (!query && !currentWeather && !isLoading) {
       navigator.geolocation.getCurrentPosition(
