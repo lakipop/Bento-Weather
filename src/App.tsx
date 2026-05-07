@@ -45,7 +45,6 @@ export default function App() {
         </div>
         <div>
           <h1 className="text-2xl font-black uppercase tracking-[0.3em] text-[var(--color-text-primary)]">Bento Weather</h1>
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">Syntecxhub Intern Project</p>
         </div>
       </div>
 

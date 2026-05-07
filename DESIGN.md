@@ -1,5 +1,5 @@
-# DESIGN.md — Syntecxhub Weather App
-# Location: /Syntecxhub_Weather-App/DESIGN.md
+# DESIGN.md — Bento Weather
+# Location: /Bento-Weather/DESIGN.md
 # Purpose: Project-specific design tokens and nature-inspired aesthetic rules.
 
 ---
@@ -59,8 +59,8 @@ Derived from `weatherappcolors.jpg` and `weatherappdesign.jpg`.
 ```
 
 ---
-**Developer:** LSR Vidanaarachchi<br>
+**Developer:** LakiDev (LSR Vidanaarachchi)<br>
 **Portfolio:** [lakidev.me](https://lakidev.me/)<br>
 **GitHub:** [lakipop](https://github.com/lakipop)<br>
 
-*Developed for the SyntecXhub Internship Program*
+*A Personal Portfolio Project*

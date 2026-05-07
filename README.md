@@ -1,12 +1,11 @@
-# Syntecxhub Weather App
-# Syntecxhub Weather App
+# Bento Weather
 
 ![React](https://img.shields.io/badge/React-19.0.0-blue?style=for-the-badge&logo=react)
 ![Vite](https://img.shields.io/badge/Vite-6.0-purple?style=for-the-badge&logo=vite)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind-4.0-38B2AC?style=for-the-badge&logo=tailwind-css)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue?style=for-the-badge&logo=typescript)
 
-An intuitive, beautifully designed weather forecasting application built for the **Syntecxhub Internship Program**. It features a premium "Bento Grid" layout with nature-inspired glass aesthetics.
+An intuitive, beautifully designed weather forecasting application featuring a premium "Bento Grid" layout with nature-inspired glass aesthetics. This project was developed as part of my personal portfolio to demonstrate high-end UI/UX and React state management.
 
 ## 🚀 Features
 
@@ -30,8 +29,8 @@ An intuitive, beautifully designed weather forecasting application built for the
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/lakipop/Syntecxhub_Weather-App.git
-   cd Syntecxhub_Weather-App
+   git clone https://github.com/lakipop/Bento-Weather.git
+   cd Bento-Weather
    ```
 
 2. **Install dependencies**
@@ -65,8 +64,8 @@ An intuitive, beautifully designed weather forecasting application built for the
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
-**Developer:** LSR Vidanaarachchi<br>
+**Developer:** LakiDev (LSR Vidanaarachchi)<br>
 **Portfolio:** [lakidev.me](https://lakidev.me/)<br>
 **GitHub:** [lakipop](https://github.com/lakipop)<br>
 
-*Developed for the SyntecXhub Internship Program*
+*A Personal Portfolio Project*

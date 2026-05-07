@@ -1,7 +1,7 @@
-# System Architecture: Weather App
+# System Architecture: Bento Weather
 
 ## 1. High-Level Overview
-The SyntecXhub Weather App is a dynamic, data-driven application connecting to the OpenWeatherMap API. The architecture centers around an "Ambient Glass UI" concept where application state (weather conditions) directly drives the CSS environment via injected class styles.
+The Bento Weather App is a dynamic, data-driven application connecting to the OpenWeatherMap API. The architecture centers around an "Ambient Glass UI" concept where application state (weather conditions) directly drives the CSS environment via injected class styles.
 
 ## 2. Technology Stack
 - **Core:** React 19, TypeScript 5.7
@@ -73,8 +73,8 @@ graph TD
 ```
 
 ---
-**Developer:** LSR Vidanaarachchi<br>
+**Developer:** LakiDev (LSR Vidanaarachchi)<br>
 **Portfolio:** [lakidev.me](https://lakidev.me/)<br>
 **GitHub:** [lakipop](https://github.com/lakipop)<br>
 
-*Developed for the SyntecXhub Internship Program*
+*A Personal Portfolio Project*
